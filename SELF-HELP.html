@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game with RBT Reports & Email Verification</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1, h2, .footer {
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<h1>Game with RBT Reports & Email Verification</h1>
+
+<!-- Sections -->
+<div id="chooseAccessSection">
+    <h2>Select Access Method</h2>
+    <button class="button" onclick="toggleSection('adminPasswordSection')">Admin Password</button>
+    <button class="button" onclick="toggleSection('emailSection')">Email Verification</button>
+    <button class="button" onclick="toggleSection('signUpSection')">Sign Up</button>
+    <div id="googleSignInButton"></div> <!-- Google Sign-In button -->
+</div>
+
+<!-- Admin Password Section -->
+<div id="adminPasswordSection" class="hidden">
+    <h2>Enter Admin Password</h2>
+    <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+    <button class="button" onclick="checkAdminPassword()">Submit</button>
+    <p id="adminMessage" style="color: red;"></p>
+</div>
+
+<!-- Email Verification Section -->
+<div id="emailSection" class="hidden">
+    <p>Please enter your email:</p>
+    <input type="email" id="userEmail" placeholder="Enter your email">
+    <button class="button" onclick="sendConfirmationEmail()">Send Link</button>
+</div>
+
+<!-- Sign Up Section -->
+<div id="signUpSection" class="hidden">
+    <h2>Sign Up</h2>
+    <input type="email" id="signUpEmail" placeholder="Email">
+    <input type="password" id="signUpPassword" placeholder="4-digit PIN" maxlength="4">
+    <input type="text" id="userName" placeholder="Name">
+    <button class="button" onclick="signUpUser()">Sign Up</button>
+</div>
+
+<!-- Confirmation Section -->
+<div id="confirmationSection" class="hidden">
+    <p>Confirmation link sent to <span id="emailDisplay"></span>.</p>
+    <button class="button" onclick="verifyEmail()">Confirm Email</button>
+</div>
+
+<!-- Game Section -->
+<div id="gameSection" class="hidden">
+    <h2>Game</h2>
+    <p>Choose a category:</p>
+    <button class="button" onclick="logActivity('Affirmation')">💪 Affirmation</button>
+    <button class="button" onclick="logActivity('Tip')">💡 Tip</button>
+    <button class="button" onclick="logActivity('Confidence Booster')">🚀 Confidence</button>
+    <button class="button" onclick="logActivity('Activity')">🎨 Activity</button>
+    <button class="button" onclick="completeSession()">Complete Session</button>
+    <div id="gameOutput"></div>
+</div>
+
+<!-- RBT Dashboard Section -->
+<div id="rbtDashboardSection" class="hidden">
+    <h2>RBT Dashboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User Email</th>
+                <th>Activity</th>
+            </tr>
+        </thead>
+        <tbody id="activityLogs"></tbody>
+    </table>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>Need support? Visit:</p>
+    <a href="https://www.mentalhealth.gov" target="_blank">Mental Health</a> |
+    <a href="https://www.headspace.com" target="_blank">Meditation</a> |
+    <a href="https://www.psychologytoday.com" target="_blank">Find a Therapist</a>
+</div>
+
+<script>
+// Game Data
+const adminPassword = "1995";
+let userEmail = "", userName = "Guest";
+const activityLog = [];
+const dictionaryWords = ["apple", "banana", "cherry", "dog", "cat", "ball", "sun", "moon"];
+
+const items = {
+    affirmations: [
+        "You are amazing!", 
+        "You are capable!", 
+        "Your potential is limitless!",
+        "You are strong!",
+        "You matter!"
+    ],
+    tips: [
+        "Take breaks to clear your mind.", 
+        "Stay hydrated.", 
+        "Prioritize tasks.", 
+        "Don't forget to stretch!", 
+        "Set small, achievable goals."
+    ],
+    confidence: [
+        "You got this!", 
+        "Believe in yourself!", 
+        "Confidence comes from within.", 
+        "You are unstoppable!",
+        "Embrace your uniqueness!"
+    ],
+    activities: [
+        "Draw something happy!", 
+        "Go for a walk.", 
+        "Dance to your favorite song!", 
+        "Write down your thoughts.",
+        "Take a deep breath and relax."
+    ]
+};
+
+// Track used items
+const usedItems = {
+    affirmations: [],
+    tips: [],
+    confidence: [],
+    activities: []
+};
+
+// Toggle Sections
+function toggleSection(sectionId) {
+    document.querySelectorAll('div[id$="Section"]').forEach(div => div.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+}
+
+// Admin Password Check
+function checkAdminPassword() {
+    const enteredPassword = document.getElementById('adminPassword').value;
+    if (enteredPassword === adminPassword) {
+        alert("Access granted");
+        toggleSection('gameSection');
+    } else {
+        document.getElementById('adminMessage').innerText = "Incorrect password.";
+    }
+}
+
+// Email Verification
+function sendConfirmationEmail() {
+    userEmail = document.getElementById('userEmail').value;
+    if (userEmail) {
+        alert("Confirmation sent!");
+        document.getElementById('emailDisplay').innerText = userEmail;
+        toggleSection('confirmationSection');
+    } else {
+        alert("Enter a valid email.");
+    }
+}
+
+function verifyEmail() {
+    alert("Email confirmed! Welcome!");
+    toggleSection('gameSection');
+}
+
+// Sign Up User
+function signUpUser() {
+    const email = document.getElementById('signUpEmail').value;
+    const password = document.getElementById('signUpPassword').value;
+    userName = document.getElementById('userName').value;
+
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    const passwordPattern = /^\d{4}$/;
+    if (!passwordPattern.test(password)) {
+        alert("Password must be a 4-digit PIN.");
+        return;
+    }
+
+    if (!dictionaryWords.includes(userName.toLowerCase())) {
+        alert("Please enter a valid name from the dictionary.");
+        return;
+    }
+
+    alert("Sign-up successful!");
+    document.getElementById('greeting').innerText = `Hello, ${userName}!`;
+    document.getElementById('greeting').classList.remove('hidden');
+    toggleSection('gameSection');
+}
+
+// Log User Activity
+function logActivity(activity) {
+    const timestamp = new Date().toLocaleString();
+    if (!userEmail) userEmail = "Guest";
+
+    activityLog.push({ timestamp, userEmail, activity });
+
+    document.getElementById('gameOutput').textContent = `You chose: ${activity}`;
+}
+
+// Complete Session
+function completeSession() {
+    alert("Session completed! RBT login is now available.");
+    toggleSection('loginSection');
+}
+
+// RBT Login
+function loginRBT() {
+    const username = document.getElementById('rbtUsername').value;
+    const password = document.getElementById('rbtPassword').value;
+    if (username === 'rbt_admin' && password === '1234') {
+        toggleSection('rbtDashboardSection');
+        displayActivityLogs();
+    } else {
+        alert("Invalid RBT login credentials.");
+    }
+}
+
+// Display Activity Logs
+function displayActivityLogs() {
+    const activityLogsTable = document.getElementById('activityLogs');
+    activityLogsTable.innerHTML = "";
+    activityLog.forEach(log => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${log.timestamp}</td><td>${log.userEmail}</td><td>${log.activity}</td>`;
+        activityLogsTable.appendChild(row);
+    });
+}
+
+// Google Sign-In (optional, can be implemented if necessary)
+function onSignIn(googleUser) {
+    const profile = googleUser.getBasicProfile();
+    document.getElementById('userEmail').value = profile.getEmail();
+    sendConfirmationEmail();
+}
+
+</script>
+
+</body>
+</html>
