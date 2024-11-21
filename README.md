@@ -10,6 +10,6 @@ STEP 4: WHEN DONE SAVING TO YOUR COMPUTER OPEN CHROME OR FIREFOX ( I WOULD USE C
 
 STEP 5: YOU WILL THEN GET BROUGHT TO THE FILE
 
-and if you don't want to do any of that go to https://rbtkidsdashboard.netlify.app for the whole website put together for you! 
+and if you don't want to do any of that go to https://self-help02.netlify.app for the whole website put together for you! 
 
 have a good day!
